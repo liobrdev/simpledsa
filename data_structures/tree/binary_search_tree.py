@@ -501,3 +501,4 @@ class BinarySearchTree(BinaryTree[int | float | str, VT]):
 
     def remove(self, key: int | float | str):
         self.__delitem__(key)
+
