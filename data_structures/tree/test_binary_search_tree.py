@@ -393,112 +393,112 @@ def test_construct_bst_post_order_fail():
     ) in str(e.value)
 
 
-def test_bst_lookup_success(example_perfect_bst_small: BST[str]):
-    assert example_perfect_bst_small.lookup(1) == 'first'
-    assert example_perfect_bst_small.lookup(2) == 'second'
-    assert example_perfect_bst_small.lookup(3) == 'third'
+def test_bst_get_success(example_perfect_bst_small: BST[str]):
+    assert example_perfect_bst_small.get(1) == 'first'
+    assert example_perfect_bst_small.get(2) == 'second'
+    assert example_perfect_bst_small.get(3) == 'third'
     assert example_perfect_bst_small[1] == 'first'
     assert example_perfect_bst_small[2] == 'second'
     assert example_perfect_bst_small[3] == 'third'
 
 
-def test_bst_lookup_fail_runtimeerror():
+def test_bst_get_fail_runtimeerror():
     t = BST()
 
     with raises(RuntimeError) as e:
-        t.lookup(1)
+        t.get(1)
 
     assert 'Key type not defined!' in str(e.value)
 
 
-def test_bst_lookup_fail_keyerror(example_perfect_bst_small: BST[str]):
+def test_bst_get_fail_keyerror(example_perfect_bst_small: BST[str]):
     with raises(KeyError) as e:
-        example_perfect_bst_small.lookup(4)
+        example_perfect_bst_small.get(4)
 
     assert 'Key 4 not found!' in str(e.value)
 
 
-def test_bst_lookup_fail_typeerror(example_perfect_bst_small: BST[str]):
+def test_bst_get_fail_typeerror(example_perfect_bst_small: BST[str]):
     with raises(TypeError) as e:
-        example_perfect_bst_small.lookup('1')
+        example_perfect_bst_small.get('1')
 
     assert f"Key must be of type <class 'int'>!" in str(e.value)
 
 
-def test_bst_insert_success_existing(example_perfect_bst_small: BST[str]):
+def test_bst_put_success_insert(example_perfect_bst_small: BST[str]):
     with raises(KeyError) as e:
-        example_perfect_bst_small.lookup(4)
+        example_perfect_bst_small.get(4)
     assert 'Key 4 not found!' in str(e.value)
 
-    example_perfect_bst_small.insert(4, 'fourth')
-    assert example_perfect_bst_small.lookup(4) == 'fourth'
+    example_perfect_bst_small.put(4, 'fourth')
+    assert example_perfect_bst_small.get(4) == 'fourth'
     example_perfect_bst_small[5] = 'fifth'
-    assert example_perfect_bst_small.lookup(5) == 'fifth'
+    assert example_perfect_bst_small.get(5) == 'fifth'
 
 
-def test_bst_insert_success_empty():
+def test_bst_put_success_update(example_perfect_bst_small: BST[str]):
+    assert example_perfect_bst_small.get(3) == 'third'
+    example_perfect_bst_small.put(3, 'new_third')
+    assert example_perfect_bst_small.get(3) == 'new_third'
+    example_perfect_bst_small[3] = 'newer_third'
+    assert example_perfect_bst_small.get(3) == 'newer_third'
+
+
+def test_bst_put_success_empty():
     t = BST()
     assert t._root is None
     assert t._key_type is None
     assert t._value_type is None
 
     with raises(RuntimeError) as e:
-        t.lookup('1')
+        t.get('1')
     assert 'Key type not defined!' in str(e.value)
 
-    t.insert('1', 'first')
-    assert t.lookup('1') == 'first'
+    t.put('1', 'first')
+    assert t.get('1') == 'first'
     assert t._root is not None
     assert t._root.key == '1'
     assert t._root.value == 'first'
     assert str(t._key_type) == "<class 'str'>"
     assert str(t._value_type) == "<class 'str'>"
     t['2'] = 'second'
-    assert t.lookup('2') == 'second'
+    assert t.get('2') == 'second'
     assert t._root.right.key == '2'
     assert t._root.right.value == 'second'
 
 
-def test_bst_insert_fail_invalid_key(example_perfect_bst_small: BST[str]):
+def test_bst_put_fail_invalid_key(example_perfect_bst_small: BST[str]):
     with raises(TypeError) as e:
-        example_perfect_bst_small.insert((4,), 'fourth') # type: ignore
+        example_perfect_bst_small.put((4,), 'fourth') # type: ignore
 
     assert 'Invalid key!' in str(e.value)
 
 
-def test_bst_insert_fail_typeerror_key(example_perfect_bst_small: BST[str]):
+def test_bst_put_fail_typeerror_key(example_perfect_bst_small: BST[str]):
     with raises(TypeError) as e:
-        example_perfect_bst_small.insert('4', 'fourth')
+        example_perfect_bst_small.put('4', 'fourth')
 
     assert f"Key must be of type <class 'int'>!" in str(e.value)
 
 
-def test_bst_insert_fail_typeerror_value(example_perfect_bst_small: BST[str]):
+def test_bst_put_fail_typeerror_value(example_perfect_bst_small: BST[str]):
     with raises(TypeError) as e:
-        example_perfect_bst_small.insert(4, 400) # type: ignore
+        example_perfect_bst_small.put(4, 400) # type: ignore
 
     assert f"Value must be of type <class 'str'>!" in str(e.value)
 
 
-def test_bst_update_success(example_perfect_bst_small: BST[str]):
-    assert example_perfect_bst_small.lookup(3) == 'third'
-    example_perfect_bst_small.update(3, 'new_third')
-    assert example_perfect_bst_small.lookup(3) == 'new_third'
-    example_perfect_bst_small[3] = 'newer_third'
-    assert example_perfect_bst_small.lookup(3) == 'newer_third'
-
-
 def test_bst_remove_success(example_perfect_bst_small: BST[str]):
-    assert example_perfect_bst_small.lookup(3) == 'third'
+    assert example_perfect_bst_small.get(3) == 'third'
     example_perfect_bst_small.remove(3)
     with raises(KeyError) as e:
-        example_perfect_bst_small.lookup(3)
+        example_perfect_bst_small.get(3)
     assert 'Key 3 not found!' in str(e.value)
 
-    assert example_perfect_bst_small.lookup(2) == 'second'
+    assert example_perfect_bst_small.get(2) == 'second'
     del example_perfect_bst_small[2]
     with raises(KeyError) as e:
-        example_perfect_bst_small.lookup(2)
+        example_perfect_bst_small.get(2)
     assert 'Key 2 not found!' in str(e.value)
 
 

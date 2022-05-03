@@ -487,15 +487,11 @@ class BinarySearchTree(BinaryTree[int | float | str, VT]):
         raise KeyError(f"Key {error_key} not found!")
 
 
-    def lookup(self, key: int | float | str) -> Optional[VT]:
+    def get(self, key: int | float | str) -> Optional[VT]:
         return self.__getitem__(key)
 
 
-    def insert(self, key: int | float | str, value: Optional[VT]):
-        self.__setitem__(key, value)
-
-
-    def update(self, key: int | float | str, value: Optional[VT]):
+    def put(self, key: int | float | str, value: Optional[VT]):
         self.__setitem__(key, value)
 
 
