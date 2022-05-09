@@ -295,3 +295,33 @@ class BinaryTree(Generic[KT, VT]):
                 current = None
 
         return nodes
+
+
+    def height(self) -> int:
+        height: int = -1
+
+        if not self._root:
+            return height
+
+        queue: Queue[Stack[Node[KT, VT]]] = Queue(Stack(self._root))
+
+        while not queue.is_empty():
+            height += 1
+
+            current_stack = queue.dequeue()
+            next_stack: Stack[Node[KT, VT]] = Stack()
+
+            while not current_stack.is_empty():
+                current_node = current_stack.pop()
+
+                if current_node.left:
+                    next_stack.push(current_node.left)
+
+                if current_node.right:
+                     next_stack.push(current_node.right)
+
+            if not next_stack.is_empty():
+                queue.enqueue(next_stack)
+
+        return height
+

@@ -2,6 +2,7 @@ from pytest import mark, raises
 from typing import Any
 
 from . import BinaryTree
+from ..utils import BinaryTreeNode as Node
 
 
 @mark.parametrize('args', [
@@ -169,4 +170,30 @@ def test_binary_tree_traverse_boundaries(
         ('thirteenth', 13), ('fourteenth', 14), ('fifteenth', 15),
         ('seventh', 7), ('third', 3),]
 
+
+def test_binary_tree_height(
+    example_perfect_binary_tree_small: BinaryTree[str, int],
+    example_perfect_binary_tree_medium: BinaryTree[str, int],
+    example_perfect_binary_tree_large: BinaryTree[str, int],
+):
+    assert BinaryTree().height() == -1
+    assert example_perfect_binary_tree_small.height() == 1
+    assert example_perfect_binary_tree_medium.height() == 2
+    assert example_perfect_binary_tree_large.height() == 3
+
+    t = BinaryTree(('first', 1))
+    assert t.height() == 0
+    t._root.left = Node('second', 2) # type: ignore
+    assert t.height() == 1
+    t._root.left.left = Node('fourth', 4) # type: ignore
+    assert t.height() == 2
+    t._root.left.right = Node('fifth', 5) # type: ignore
+    assert t.height() == 2
+    t._root.left.left = None # type: ignore
+    t._root.left.right = None # type: ignore
+    assert t.height() == 1
+    t._root.left = None # type: ignore
+    assert t.height() == 0
+    t._root = None
+    assert t.height() == -1
 
