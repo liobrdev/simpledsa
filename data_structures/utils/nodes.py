@@ -7,13 +7,9 @@ VT = TypeVar('VT')
 
 
 class LinearNode(Generic[DT]):
-    def __init__(
-        self,
-        data: DT,
-        next: Optional['LinearNode[DT]'] = None,
-    ):
+    def __init__(self, data: DT):
         self.data = data
-        self.next = next
+        self.next: Optional['LinearNode[DT]'] = None
 
     def __repr__(self):
         return str({
@@ -24,17 +20,11 @@ class LinearNode(Generic[DT]):
 
 
 class BinaryTreeNode(Generic[KT, VT]):
-    def __init__(
-        self,
-        key: KT,
-        value: Optional[VT] = None,
-        left: Optional['BinaryTreeNode[KT, VT]'] = None,
-        right: Optional['BinaryTreeNode[KT, VT]'] = None,
-    ):
+    def __init__(self, key: KT, value: Optional[VT] = None):
         self.key = key
         self.value = value
-        self.left = left
-        self.right = right
+        self.left: Optional['BinaryTreeNode[KT, VT]'] = None
+        self.right: Optional['BinaryTreeNode[KT, VT]'] = None
 
 
     def __repr__(self):
@@ -45,3 +35,4 @@ class BinaryTreeNode(Generic[KT, VT]):
             'has_left': bool(self.left),
             'has_right': bool(self.right),
         })
+

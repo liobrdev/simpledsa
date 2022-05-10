@@ -84,7 +84,8 @@ class Stack(Generic[DT]):
         elif not isinstance(data, self._data_type):
             raise TypeError(f"Value must be of type {self._data_type}!")
 
-        node = Node(data, self._top)
+        node = Node(data)
+        node.next = self._top
         self._top = node
 
 

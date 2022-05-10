@@ -162,7 +162,8 @@ class LinkedList(Generic[DT]):
             previous = current
             current = current.next
 
-        node = Node(data, current)
+        node = Node(data)
+        node.next = current
 
         if previous:
             previous.next = node
@@ -249,7 +250,8 @@ class LinkedList(Generic[DT]):
                 current = current.next
                 counter += 1
 
-            node = Node(data, current)
+            node = Node(data)
+            node.next = current
 
             if previous:
                 previous.next = node
