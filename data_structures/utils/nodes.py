@@ -36,3 +36,11 @@ class BinaryTreeNode(Generic[KT, VT]):
             'has_right': bool(self.right),
         })
 
+
+class AVLTreeNode(BinaryTreeNode[KT, VT]):
+    def __init__(self, key: KT, value: Optional[VT] = None):
+        self.key = key
+        self.value = value
+        self.left: Optional['AVLTreeNode[KT, VT]'] = None
+        self.right: Optional['AVLTreeNode[KT, VT]'] = None
+        self.height: int = 0
