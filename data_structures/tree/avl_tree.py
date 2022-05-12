@@ -104,3 +104,15 @@ class AVLTree(BinarySearchTree[VT]):
                 current = None
 
         return heights
+
+
+    def copy(self) -> 'AVLTree[VT]':
+        tree_copy: 'AVLTree[VT]' = AVLTree()
+
+        if not self._root:
+            return tree_copy
+
+        tree_copy = self._helper_copy_tree(tree_copy, Node)
+        tree_copy._set_node_heights()
+        return tree_copy
+

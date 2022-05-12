@@ -197,3 +197,32 @@ def test_binary_tree_height(
     t._root = None
     assert t.height() == -1
 
+
+def test_binary_tree_copy(
+    example_perfect_binary_tree_small: BinaryTree[str, int],
+    example_perfect_binary_tree_medium: BinaryTree[str, int],
+    example_perfect_binary_tree_large: BinaryTree[str, int],
+):
+    empty: BinaryTree = BinaryTree()
+    empty_copy = empty.copy()
+    assert empty is not empty_copy
+    assert empty.height() == -1
+    assert empty_copy.height() == -1
+
+    for tree in (
+        example_perfect_binary_tree_small,
+        example_perfect_binary_tree_medium,
+        example_perfect_binary_tree_large,
+    ):
+        copy = tree.copy()
+        assert copy is not tree
+        assert copy._root is not None and tree._root is not None
+        assert copy._root is not tree._root
+        assert copy._root.key == tree._root.key
+        assert copy._root.value == tree._root.value
+        assert copy.traverse_level_order() == tree.traverse_level_order()
+        assert copy.traverse_pre_order() == tree.traverse_pre_order()
+        assert copy.traverse_in_order() == tree.traverse_in_order()
+        assert copy.traverse_post_order() == tree.traverse_post_order()
+        assert copy.traverse_boundaries() == tree.traverse_boundaries()
+        assert copy.height() == tree.height()

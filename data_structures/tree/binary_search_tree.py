@@ -487,6 +487,15 @@ class BinarySearchTree(BinaryTree[int | float | str, VT]):
         raise KeyError(f"Key {error_key} not found!")
 
 
+    def copy(self) -> 'BinarySearchTree[VT]':
+        tree_copy: 'BinarySearchTree[VT]' = BinarySearchTree()
+
+        if not self._root:
+            return tree_copy
+
+        return self._helper_copy_tree(tree_copy, Node)
+
+
     def get(self, key: int | float | str) -> Optional[VT]:
         return self.__getitem__(key)
 

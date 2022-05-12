@@ -1,4 +1,4 @@
-from typing import Generic, Optional, Type, TypeVar
+from typing import Callable, Generic, Optional, Type, TypeVar
 
 from ..queue import Queue
 from ..stack import Stack
@@ -7,6 +7,9 @@ from ..utils import BinaryTreeNode as Node
 
 KT = TypeVar('KT')
 VT = TypeVar('VT')
+
+NodeCopy = TypeVar('NodeCopy', bound=Node)
+TreeCopy = TypeVar('TreeCopy', bound='BinaryTree')
 
 
 class BinaryTree(Generic[KT, VT]):
@@ -60,6 +63,64 @@ class BinaryTree(Generic[KT, VT]):
                     node.right = nodes[index * 2 + 2]
                 except IndexError:
                     break
+    
+
+    def _helper_copy_tree(
+        self, tree: TreeCopy, Node: Callable[..., NodeCopy],
+    ) -> TreeCopy:
+        current = self._root or None
+
+        if not current:
+            return tree
+
+        ancestors: Stack = Stack()
+        previous = None
+
+        ancestors_copy: Stack[NodeCopy] = Stack()
+        current_copy: Optional[NodeCopy] = Node(current.key, current.value)
+
+        tree._root = current_copy
+        tree._key_type = self._key_type
+        tree._value_type = self._value_type
+
+        while current and current_copy:
+            try:
+                parent = ancestors.top()
+            except RuntimeError:
+                parent = None
+
+            if current.left and previous is parent:
+                current_copy.left = Node(current.left.key, current.left.value)
+                ancestors_copy.push(current_copy)
+                current_copy = current_copy.left
+                ancestors.push(current)
+                previous = current
+                current = current.left
+                continue
+
+            if current.right and previous is not current.right:
+                current_copy.right = \
+                    Node(current.right.key, current.right.value)
+                ancestors_copy.push(current_copy)
+                current_copy = current_copy.right
+                ancestors.push(current)
+                previous = current
+                current = current.right
+                continue
+
+            previous = current
+
+            try:
+                current = ancestors.pop()
+            except RuntimeError:
+                current = None
+
+            try:
+                current_copy = ancestors_copy.pop()
+            except RuntimeError:
+                current_copy = None
+
+        return tree
 
 
     def __len__(self) -> int:
@@ -99,6 +160,41 @@ class BinaryTree(Generic[KT, VT]):
                 current = None
 
         return count
+
+    
+    def copy(self) -> 'BinaryTree[KT, VT]':
+        empty_tree: 'BinaryTree[KT, VT]' = BinaryTree()
+
+        if not self._root:
+            return empty_tree
+
+        return self._helper_copy_tree(empty_tree, Node)
+
+
+    def height(self) -> int:
+        height: int = -1
+
+        if not self._root:
+            return height
+
+        current_level: Queue[Node[KT, VT]] = Queue(self._root)
+
+        while not current_level.is_empty():
+            height += 1
+            next_level: Queue[Node[KT, VT]] = Queue()
+
+            while not current_level.is_empty():
+                current_node = current_level.dequeue()
+
+                if current_node.left:
+                    next_level.enqueue(current_node.left)
+
+                if current_node.right:
+                     next_level.enqueue(current_node.right)
+
+            current_level = next_level
+
+        return height
 
 
     def traverse_level_order(self) -> list[tuple[KT, Optional[VT]]]:
@@ -295,30 +391,4 @@ class BinaryTree(Generic[KT, VT]):
                 current = None
 
         return nodes
-
-
-    def height(self) -> int:
-        height: int = -1
-
-        if not self._root:
-            return height
-
-        current_level: Queue[Node[KT, VT]] = Queue(self._root)
-
-        while not current_level.is_empty():
-            height += 1
-            next_level: Queue[Node[KT, VT]] = Queue()
-
-            while not current_level.is_empty():
-                current_node = current_level.dequeue()
-
-                if current_node.left:
-                    next_level.enqueue(current_node.left)
-
-                if current_node.right:
-                     next_level.enqueue(current_node.right)
-
-            current_level = next_level
-
-        return height
 
