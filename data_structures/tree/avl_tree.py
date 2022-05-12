@@ -116,3 +116,53 @@ class AVLTree(BinarySearchTree[VT]):
         tree_copy._set_node_heights()
         return tree_copy
 
+
+    def find_height_inbalance(self) -> Optional[dict[str, int | float | str]]:
+        ancestors: Stack[Node[int | float | str, VT]] = Stack()
+        previous: Optional[Node[int | float | str, VT]] = None
+        current: Optional[Node[int | float | str, VT]] = self._root
+
+        while current:
+            try:
+                parent = ancestors.top()
+            except RuntimeError:
+                parent = None
+
+            if current.left and previous is parent:
+                ancestors.push(current)
+                previous = current
+                current = current.left
+                continue
+
+            if current.right and (
+                current.left and previous is current.left
+                or not current.left and previous is parent
+            ):
+                ancestors.push(current)
+                previous = current
+                current = current.right
+                continue
+
+            left_height: int = -1
+            right_height: int = -1
+
+            if current.left:
+                left_height = current.left.height
+            
+            if current.right:
+                right_height = current.right.height
+
+            if not abs(left_height - right_height) <= 1:
+                return dict(
+                    key=current.key, left_height=left_height,
+                    right_height=right_height,)
+
+            previous = current
+
+            try:
+                current = ancestors.pop()
+            except RuntimeError:
+                current = None
+
+        return None
+
