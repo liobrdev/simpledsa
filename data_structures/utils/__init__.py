@@ -1,5 +1,5 @@
 from .infinite_string import InfiniteString
-from .nodes import LinearNode, BinaryTreeNode, AVLTreeNode
+from .nodes import LinearNode, BinaryTreeNode
 from .prime_numbers import is_prime, next_prime
 
 
@@ -19,6 +19,6 @@ def flatten(items: list):
 
 
 __all__ = [
-    'LinearNode', 'BinaryTreeNode', 'AVLTreeNode',
+    'LinearNode', 'BinaryTreeNode',
     'INF_NUM', 'INF_STR',
     'flatten', 'is_prime', 'next_prime',]

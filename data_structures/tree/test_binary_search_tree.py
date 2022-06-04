@@ -1,7 +1,6 @@
 from pytest import mark, raises
-from typing import Any
 
-from . import BinarySearchTree as BST
+from .binary_search_tree import BinarySearchTree as BST, Node
 
 
 @mark.parametrize('args', [
@@ -9,7 +8,7 @@ from . import BinarySearchTree as BST
     [(1.0, 'first'), (2.0, 'second'), (3.0, 'third')],
     [('1', 'first'), ('2', 'second'), ('3', 'third')],
 ])
-def test_initialize_bst_success(args: list[tuple[int | float | str, str]]):
+def test_initialize_bst_success(args):
     BST(*args)
 
 
@@ -18,11 +17,13 @@ def test_initialize_bst_success(args: list[tuple[int | float | str, str]]):
     [((1.0,), 'first'), ((2.0,), 'second'), ((3.0,), 'third')],
     [({'1': 1}, 'first'), ({'2': 2}, 'second'), ({'3': 3}, 'third')],
 ])
-def test_initialize_bst_fail_invalid_keys(args: list[tuple[Any, str]]):
+def test_initialize_bst_fail_invalid_keys(args):
     with raises(TypeError) as e:
         BST(*args)
 
-    assert "Keys must be of type 'int', 'float', or 'str'!" in str(e.value)
+    assert (
+        "Keys must be of type 'bytes', 'float', 'int', or 'str'!"
+    ) in str(e.value)
 
 
 @mark.parametrize('args', [
@@ -30,7 +31,7 @@ def test_initialize_bst_fail_invalid_keys(args: list[tuple[Any, str]]):
     [(1.0, 'first'), ('2.0', 'second'), (3.0, 'third')],
     [(1, 'first'), ('2', 'second'), ('3', 'third')],
 ])
-def test_initialize_bst_fail_same_key_types(args: list[tuple[Any, str]]):
+def test_initialize_bst_fail_same_key_types(args):
     with raises(TypeError) as e:
         BST(*args)
 
@@ -42,9 +43,7 @@ def test_initialize_bst_fail_same_key_types(args: list[tuple[Any, str]]):
     [(1.0, 'first'), (2.0, 2), (3.0, 'third')],
     [('1', ['first']), ('2', 'second'), ('3', 'third')],
 ])
-def test_initialize_bst_fail_same_value_types(
-    args: list[tuple[int | float | str, Any]],
-):
+def test_initialize_bst_fail_same_value_types(args):
     with raises(TypeError) as e:
         BST(*args)
 
@@ -58,65 +57,11 @@ def test_initialize_bst_fail_same_value_types(
     [{'first': 11}, {'second': 22}, {'third': 33}],
     [[10, 11], [21, 22], [32, 33]],
 ])
-def test_initialize_bst_fail_non_tuple_types(args: list[Any]):
+def test_initialize_bst_fail_non_tuple_types(args):
     with raises(TypeError) as e:
         BST(*args)
 
     assert 'All arguments must be key-value tuples!' in str(e.value)
-
-
-def test_construct_bst_default_success():
-    small = BST((2, 'second'), (1, 'first'), (3, 'third'))
-    assert small.traverse_level_order() == \
-        [(2, 'second'), (1, 'first'), (3, 'third')]
-    assert small.traverse_pre_order() == \
-        [(2, 'second'), (1, 'first'), (3, 'third')]
-    assert small.traverse_in_order() == \
-        [(1, 'first'), (2, 'second'), (3, 'third')]
-    assert small.traverse_post_order() == \
-        [(1, 'first'), (3, 'third'), (2, 'second')]
-
-    medium = BST(
-        (4, 'fourth'), (2, 'second'), (6, 'sixth'), (1, 'first'), (3, 'third'),
-        (5, 'fifth'), (7, 'seventh'),)
-    assert medium.traverse_level_order() == [
-        (4, 'fourth'), (2, 'second'), (6, 'sixth'), (1, 'first'), (3, 'third'),
-        (5, 'fifth'), (7, 'seventh'),]
-    assert medium.traverse_pre_order() == [
-        (4, 'fourth'), (2, 'second'), (1, 'first'), (3, 'third'), (6, 'sixth'),
-        (5, 'fifth'), (7, 'seventh'),]
-    assert medium.traverse_in_order() == [
-        (1, 'first'), (2, 'second'), (3, 'third'), (4, 'fourth'), (5, 'fifth'),
-        (6, 'sixth'), (7, 'seventh'),]
-    assert medium.traverse_post_order() == [
-        (1, 'first'), (3, 'third'), (2, 'second'), (5, 'fifth'),
-        (7, 'seventh'), (6, 'sixth'), (4, 'fourth'),]
-
-    large = BST(
-        (8, 'eighth'), (4, 'fourth'), (12, 'twelfth'), (2, 'second'),
-        (6, 'sixth'), (10, 'tenth'), (14, 'fourteenth'), (1, 'first'),
-        (3, 'third'), (5, 'fifth'), (7, 'seventh'), (9, 'ninth'),
-        (11, 'eleventh'), (13, 'thirteenth'), (15, 'fifteenth'),)
-    assert large.traverse_level_order() == [
-        (8, 'eighth'), (4, 'fourth'), (12, 'twelfth'), (2, 'second'),
-        (6, 'sixth'), (10, 'tenth'), (14, 'fourteenth'), (1, 'first'),
-        (3, 'third'), (5, 'fifth'), (7, 'seventh'), (9, 'ninth'),
-        (11, 'eleventh'), (13, 'thirteenth'), (15, 'fifteenth'),]
-    assert large.traverse_pre_order() == [
-        (8, 'eighth'), (4, 'fourth'), (2, 'second'), (1, 'first'),
-        (3, 'third'), (6, 'sixth'), (5, 'fifth'), (7, 'seventh'),
-        (12, 'twelfth'), (10, 'tenth'), (9, 'ninth'), (11, 'eleventh'),
-        (14, 'fourteenth'), (13, 'thirteenth'), (15, 'fifteenth'),]
-    assert large.traverse_in_order() == [
-        (1, 'first'), (2, 'second'), (3, 'third'), (4, 'fourth'), (5, 'fifth'),
-        (6, 'sixth'), (7, 'seventh'), (8, 'eighth'), (9, 'ninth'),
-        (10, 'tenth'), (11, 'eleventh'), (12, 'twelfth'), (13, 'thirteenth'),
-        (14, 'fourteenth'), (15, 'fifteenth'),]
-    assert large.traverse_post_order() == [
-        (1, 'first'), (3, 'third'), (2, 'second'), (5, 'fifth'),
-        (7, 'seventh'), (6, 'sixth'), (4, 'fourth'), (9, 'ninth'),
-        (11, 'eleventh'), (10, 'tenth'), (13, 'thirteenth'), (15, 'fifteenth'),
-        (14, 'fourteenth'), (12, 'twelfth'), (8, 'eighth'),]
 
 
 def test_construct_bst_default_fail():
@@ -125,272 +70,149 @@ def test_construct_bst_default_fail():
 
     assert (
         'Cannot construct valid binary search tree ' +
-        'from provided sequence - remove duplicate values!'
+        'from provided sequence - remove duplicate keys!'
     ) in str(e.value)
 
 
-def test_construct_bst_level_order_success():
-    small = BST((2, 'second'), (1, 'first'), (3, 'third'), level_order=True)
-    assert small.traverse_level_order() == \
+def test_bst_traverse_level_order(
+    example_perfect_bst_small: BST[str],
+    example_perfect_bst_medium: BST[str],
+    example_perfect_bst_large: BST[str],
+):
+    assert example_perfect_bst_small.traverse_level_order() == \
         [(2, 'second'), (1, 'first'), (3, 'third')]
-    assert small.traverse_pre_order() == \
-        [(2, 'second'), (1, 'first'), (3, 'third')]
-    assert small.traverse_in_order() == \
-        [(1, 'first'), (2, 'second'), (3, 'third')]
-    assert small.traverse_post_order() == \
-        [(1, 'first'), (3, 'third'), (2, 'second')]
-
-    medium = BST(
-        (4, 'fourth'), (2, 'second'), (6, 'sixth'), (1, 'first'), (3, 'third'),
-        (5, 'fifth'), (7, 'seventh'), level_order=True,)
-    assert medium.traverse_level_order() == [
+    assert example_perfect_bst_medium.traverse_level_order() == [
         (4, 'fourth'), (2, 'second'), (6, 'sixth'), (1, 'first'), (3, 'third'),
         (5, 'fifth'), (7, 'seventh'),]
-    assert medium.traverse_pre_order() == [
-        (4, 'fourth'), (2, 'second'), (1, 'first'), (3, 'third'), (6, 'sixth'),
-        (5, 'fifth'), (7, 'seventh'),]
-    assert medium.traverse_in_order() == [
-        (1, 'first'), (2, 'second'), (3, 'third'), (4, 'fourth'), (5, 'fifth'),
-        (6, 'sixth'), (7, 'seventh'),]
-    assert medium.traverse_post_order() == [
-        (1, 'first'), (3, 'third'), (2, 'second'), (5, 'fifth'),
-        (7, 'seventh'), (6, 'sixth'), (4, 'fourth'),]
-
-    large = BST(
-        (8, 'eighth'), (4, 'fourth'), (12, 'twelfth'), (2, 'second'),
-        (6, 'sixth'), (10, 'tenth'), (14, 'fourteenth'), (1, 'first'),
-        (3, 'third'), (5, 'fifth'), (7, 'seventh'), (9, 'ninth'),
-        (11, 'eleventh'), (13, 'thirteenth'), (15, 'fifteenth'),
-        level_order=True,)
-    assert large.traverse_level_order() == [
+    assert example_perfect_bst_large.traverse_level_order() == [
         (8, 'eighth'), (4, 'fourth'), (12, 'twelfth'), (2, 'second'),
         (6, 'sixth'), (10, 'tenth'), (14, 'fourteenth'), (1, 'first'),
         (3, 'third'), (5, 'fifth'), (7, 'seventh'), (9, 'ninth'),
         (11, 'eleventh'), (13, 'thirteenth'), (15, 'fifteenth'),]
-    assert large.traverse_pre_order() == [
+
+
+def test_bst_traverse_pre_order(
+    example_perfect_bst_small: BST[str],
+    example_perfect_bst_medium: BST[str],
+    example_perfect_bst_large: BST[str],
+):
+    assert example_perfect_bst_small.traverse_pre_order() == \
+        [(2, 'second'), (1, 'first'), (3, 'third')]
+    assert example_perfect_bst_medium.traverse_pre_order() == [
+        (4, 'fourth'), (2, 'second'), (1, 'first'), (3, 'third'), (6, 'sixth'),
+        (5, 'fifth'), (7, 'seventh'),]
+    assert example_perfect_bst_large.traverse_pre_order() == [
         (8, 'eighth'), (4, 'fourth'), (2, 'second'), (1, 'first'),
         (3, 'third'), (6, 'sixth'), (5, 'fifth'), (7, 'seventh'),
         (12, 'twelfth'), (10, 'tenth'), (9, 'ninth'), (11, 'eleventh'),
         (14, 'fourteenth'), (13, 'thirteenth'), (15, 'fifteenth'),]
-    assert large.traverse_in_order() == [
+
+
+def test_bst_traverse_in_order(
+    example_perfect_bst_small: BST[str],
+    example_perfect_bst_medium: BST[str],
+    example_perfect_bst_large: BST[str],
+):
+    assert example_perfect_bst_small.traverse_in_order() == \
+        [(1, 'first'), (2, 'second'), (3, 'third')]
+    assert example_perfect_bst_medium.traverse_in_order() == [
+        (1, 'first'), (2, 'second'), (3, 'third'), (4, 'fourth'), (5, 'fifth'),
+        (6, 'sixth'), (7, 'seventh'),]
+    assert example_perfect_bst_large.traverse_in_order() == [
         (1, 'first'), (2, 'second'), (3, 'third'), (4, 'fourth'), (5, 'fifth'),
         (6, 'sixth'), (7, 'seventh'), (8, 'eighth'), (9, 'ninth'),
         (10, 'tenth'), (11, 'eleventh'), (12, 'twelfth'), (13, 'thirteenth'),
         (14, 'fourteenth'), (15, 'fifteenth'),]
-    assert large.traverse_post_order() == [
+
+
+def test_binary_tree_traverse_post_order(
+    example_perfect_bst_small: BST[str],
+    example_perfect_bst_medium: BST[str],
+    example_perfect_bst_large: BST[str],
+):
+    assert example_perfect_bst_small.traverse_post_order() == \
+        [(1, 'first'), (3, 'third'), (2, 'second')]
+    assert example_perfect_bst_medium.traverse_post_order() == [
+        (1, 'first'), (3, 'third'), (2, 'second'), (5, 'fifth'),
+        (7, 'seventh'), (6, 'sixth'), (4, 'fourth'),]
+    assert example_perfect_bst_large.traverse_post_order() == [
         (1, 'first'), (3, 'third'), (2, 'second'), (5, 'fifth'),
         (7, 'seventh'), (6, 'sixth'), (4, 'fourth'), (9, 'ninth'),
         (11, 'eleventh'), (10, 'tenth'), (13, 'thirteenth'), (15, 'fifteenth'),
         (14, 'fourteenth'), (12, 'twelfth'), (8, 'eighth'),]
 
 
-def test_construct_bst_level_order_fail():
-    with raises(ValueError) as e:
-        BST(
-            (11, '11'), (6, '6'), (13, '13'), (5, '5'), (12, '12'), (10, '10'),
-            level_order=True,)
-
-    assert (
-        'Cannot construct valid binary search tree ' +
-        'from provided level-order sequence!'
-    ) in str(e.value)
+def test_bst_len(
+    example_perfect_bst_small: BST[str],
+    example_perfect_bst_medium: BST[str],
+    example_perfect_bst_large: BST[str],
+):
+    assert len(example_perfect_bst_small) == 3
+    assert len(example_perfect_bst_medium) == 7
+    assert len(example_perfect_bst_large) == 15
 
 
-def test_construct_bst_pre_order_success():
-    small = BST((2, 'second'), (1, 'first'), (3, 'third'), pre_order=True)
-    assert small.traverse_level_order() == \
-        [(2, 'second'), (1, 'first'), (3, 'third')]
-    assert small.traverse_pre_order() == \
-        [(2, 'second'), (1, 'first'), (3, 'third')]
-    assert small.traverse_in_order() == \
-        [(1, 'first'), (2, 'second'), (3, 'third')]
-    assert small.traverse_post_order() == \
-        [(1, 'first'), (3, 'third'), (2, 'second')]
+def test_bst_height(
+    example_perfect_bst_small: BST[str],
+    example_perfect_bst_medium: BST[str],
+    example_perfect_bst_large: BST[str],
+):
+    assert BST().height() == -1
+    assert example_perfect_bst_small.height() == 1
+    assert example_perfect_bst_medium.height() == 2
+    assert example_perfect_bst_large.height() == 3
 
-    medium = BST(
-        (4, 'fourth'), (2, 'second'), (1, 'first'), (3, 'third'), (6, 'sixth'),
-        (5, 'fifth'), (7, 'seventh'), pre_order=True,)
-    assert medium.traverse_level_order() == [
-        (4, 'fourth'), (2, 'second'), (6, 'sixth'), (1, 'first'), (3, 'third'),
-        (5, 'fifth'), (7, 'seventh'),]
-    assert medium.traverse_pre_order() == [
-        (4, 'fourth'), (2, 'second'), (1, 'first'), (3, 'third'), (6, 'sixth'),
-        (5, 'fifth'), (7, 'seventh'),]
-    assert medium.traverse_in_order() == [
-        (1, 'first'), (2, 'second'), (3, 'third'), (4, 'fourth'), (5, 'fifth'),
-        (6, 'sixth'), (7, 'seventh'),]
-    assert medium.traverse_post_order() == [
-        (1, 'first'), (3, 'third'), (2, 'second'), (5, 'fifth'),
-        (7, 'seventh'), (6, 'sixth'), (4, 'fourth'),]
-
-    large = BST(
-        (8, 'eighth'), (4, 'fourth'), (2, 'second'), (1, 'first'),
-        (3, 'third'), (6, 'sixth'), (5, 'fifth'), (7, 'seventh'),
-        (12, 'twelfth'), (10, 'tenth'), (9, 'ninth'), (11, 'eleventh'),
-        (14, 'fourteenth'), (13, 'thirteenth'), (15, 'fifteenth'),
-        pre_order=True,)
-    assert large.traverse_level_order() == [
-        (8, 'eighth'), (4, 'fourth'), (12, 'twelfth'), (2, 'second'),
-        (6, 'sixth'), (10, 'tenth'), (14, 'fourteenth'), (1, 'first'),
-        (3, 'third'), (5, 'fifth'), (7, 'seventh'), (9, 'ninth'),
-        (11, 'eleventh'), (13, 'thirteenth'), (15, 'fifteenth'),]
-    assert large.traverse_pre_order() == [
-        (8, 'eighth'), (4, 'fourth'), (2, 'second'), (1, 'first'),
-        (3, 'third'), (6, 'sixth'), (5, 'fifth'), (7, 'seventh'),
-        (12, 'twelfth'), (10, 'tenth'), (9, 'ninth'), (11, 'eleventh'),
-        (14, 'fourteenth'), (13, 'thirteenth'), (15, 'fifteenth'),]
-    assert large.traverse_in_order() == [
-        (1, 'first'), (2, 'second'), (3, 'third'), (4, 'fourth'), (5, 'fifth'),
-        (6, 'sixth'), (7, 'seventh'), (8, 'eighth'), (9, 'ninth'),
-        (10, 'tenth'), (11, 'eleventh'), (12, 'twelfth'), (13, 'thirteenth'),
-        (14, 'fourteenth'), (15, 'fifteenth'),]
-    assert large.traverse_post_order() == [
-        (1, 'first'), (3, 'third'), (2, 'second'), (5, 'fifth'),
-        (7, 'seventh'), (6, 'sixth'), (4, 'fourth'), (9, 'ninth'),
-        (11, 'eleventh'), (10, 'tenth'), (13, 'thirteenth'), (15, 'fifteenth'),
-        (14, 'fourteenth'), (12, 'twelfth'), (8, 'eighth'),]
+    t = BST((1, 'first'))
+    assert t.height() == 0
+    t._BinarySearchTree__root.left = Node(2, 'second') # type: ignore
+    assert t.height() == 1
+    t._BinarySearchTree__root.left.left = Node(4, 'fourth') # type: ignore
+    assert t.height() == 2
+    t._BinarySearchTree__root.left.right = Node(5, 'fifth') # type: ignore
+    assert t.height() == 2
+    t._BinarySearchTree__root.left.left = None # type: ignore
+    t._BinarySearchTree__root.left.right = None # type: ignore
+    assert t.height() == 1
+    t._BinarySearchTree__root.left = None # type: ignore
+    assert t.height() == 0
+    t._BinarySearchTree__root = None # type: ignore
+    assert t.height() == -1
 
 
-def test_construct_bst_pre_order_fail():
-    with raises(ValueError) as e:
-        BST(
-            (5, '5'), (3, '3'), (4, '4'), (1, '1'), (6, '6'), (10, '10'),
-            pre_order=True,)
+def test_bst_copy(
+    example_perfect_bst_small: BST[str],
+    example_perfect_bst_medium: BST[str],
+    example_perfect_bst_large: BST[str],
+):
+    empty: BST = BST()
+    empty_copy = empty.copy()
+    assert empty is not empty_copy
+    assert empty.height() == -1
+    assert empty_copy.height() == -1
 
-    assert (
-        'Cannot construct valid binary search tree ' +
-        'from provided pre-order sequence!'
-    ) in str(e.value)
-
-
-def test_construct_bst_in_order_success():
-    small = BST((1, 'first'), (2, 'second'), (3, 'third'), in_order=True)
-    assert small.traverse_level_order() == \
-        [(2, 'second'), (1, 'first'), (3, 'third')]
-    assert small.traverse_pre_order() == \
-        [(2, 'second'), (1, 'first'), (3, 'third')]
-    assert small.traverse_in_order() == \
-        [(1, 'first'), (2, 'second'), (3, 'third')]
-    assert small.traverse_post_order() == \
-        [(1, 'first'), (3, 'third'), (2, 'second')]
-
-    medium = BST(
-        (1, 'first'), (2, 'second'), (3, 'third'), (4, 'fourth'), (5, 'fifth'),
-        (6, 'sixth'), (7, 'seventh'), in_order=True,)
-    assert medium.traverse_level_order() == [
-        (4, 'fourth'), (2, 'second'), (6, 'sixth'), (1, 'first'), (3, 'third'),
-        (5, 'fifth'), (7, 'seventh'),]
-    assert medium.traverse_pre_order() == [
-        (4, 'fourth'), (2, 'second'), (1, 'first'), (3, 'third'), (6, 'sixth'),
-        (5, 'fifth'), (7, 'seventh'),]
-    assert medium.traverse_in_order() == [
-        (1, 'first'), (2, 'second'), (3, 'third'), (4, 'fourth'), (5, 'fifth'),
-        (6, 'sixth'), (7, 'seventh'),]
-    assert medium.traverse_post_order() == [
-        (1, 'first'), (3, 'third'), (2, 'second'), (5, 'fifth'),
-        (7, 'seventh'), (6, 'sixth'), (4, 'fourth'),]
-
-    large = BST(
-        (1, 'first'), (2, 'second'), (3, 'third'), (4, 'fourth'), (5, 'fifth'),
-        (6, 'sixth'), (7, 'seventh'), (8, 'eighth'), (9, 'ninth'),
-        (10, 'tenth'), (11, 'eleventh'), (12, 'twelfth'), (13, 'thirteenth'),
-        (14, 'fourteenth'), (15, 'fifteenth'), in_order=True,)
-    assert large.traverse_level_order() == [
-        (8, 'eighth'), (4, 'fourth'), (12, 'twelfth'), (2, 'second'),
-        (6, 'sixth'), (10, 'tenth'), (14, 'fourteenth'), (1, 'first'),
-        (3, 'third'), (5, 'fifth'), (7, 'seventh'), (9, 'ninth'),
-        (11, 'eleventh'), (13, 'thirteenth'), (15, 'fifteenth'),]
-    assert large.traverse_pre_order() == [
-        (8, 'eighth'), (4, 'fourth'), (2, 'second'), (1, 'first'),
-        (3, 'third'), (6, 'sixth'), (5, 'fifth'), (7, 'seventh'),
-        (12, 'twelfth'), (10, 'tenth'), (9, 'ninth'), (11, 'eleventh'),
-        (14, 'fourteenth'), (13, 'thirteenth'), (15, 'fifteenth'),]
-    assert large.traverse_in_order() == [
-        (1, 'first'), (2, 'second'), (3, 'third'), (4, 'fourth'), (5, 'fifth'),
-        (6, 'sixth'), (7, 'seventh'), (8, 'eighth'), (9, 'ninth'),
-        (10, 'tenth'), (11, 'eleventh'), (12, 'twelfth'), (13, 'thirteenth'),
-        (14, 'fourteenth'), (15, 'fifteenth'),]
-    assert large.traverse_post_order() == [
-        (1, 'first'), (3, 'third'), (2, 'second'), (5, 'fifth'),
-        (7, 'seventh'), (6, 'sixth'), (4, 'fourth'), (9, 'ninth'),
-        (11, 'eleventh'), (10, 'tenth'), (13, 'thirteenth'), (15, 'fifteenth'),
-        (14, 'fourteenth'), (12, 'twelfth'), (8, 'eighth'),]
-
-
-def test_construct_bst_in_order_fail():
-    with raises(ValueError) as e:
-        BST((1, '1'), (2, '2'), (4, '4'), (3, '3'), (5, '5'), in_order=True)
-
-    assert (
-        'Cannot construct valid binary search tree ' +
-        'from provided in-order sequence!'
-    ) in str(e.value)
-
-
-def test_construct_bst_post_order_success():
-    small = BST((1, 'first'), (3, 'third'), (2, 'second'), post_order=True)
-    assert small.traverse_level_order() == \
-        [(2, 'second'), (1, 'first'), (3, 'third')]
-    assert small.traverse_pre_order() == \
-        [(2, 'second'), (1, 'first'), (3, 'third')]
-    assert small.traverse_in_order() == \
-        [(1, 'first'), (2, 'second'), (3, 'third')]
-    assert small.traverse_post_order() == \
-        [(1, 'first'), (3, 'third'), (2, 'second')]
-
-    medium = BST(
-        (1, 'first'), (3, 'third'), (2, 'second'), (5, 'fifth'),
-        (7, 'seventh'), (6, 'sixth'), (4, 'fourth'), post_order=True,)
-    assert medium.traverse_level_order() == [
-        (4, 'fourth'), (2, 'second'), (6, 'sixth'), (1, 'first'), (3, 'third'),
-        (5, 'fifth'), (7, 'seventh'),]
-    assert medium.traverse_pre_order() == [
-        (4, 'fourth'), (2, 'second'), (1, 'first'), (3, 'third'), (6, 'sixth'),
-        (5, 'fifth'), (7, 'seventh'),]
-    assert medium.traverse_in_order() == [
-        (1, 'first'), (2, 'second'), (3, 'third'), (4, 'fourth'), (5, 'fifth'),
-        (6, 'sixth'), (7, 'seventh'),]
-    assert medium.traverse_post_order() == [
-        (1, 'first'), (3, 'third'), (2, 'second'), (5, 'fifth'),
-        (7, 'seventh'), (6, 'sixth'), (4, 'fourth'),]
-
-    large = BST(
-        (1, 'first'), (3, 'third'), (2, 'second'), (5, 'fifth'),
-        (7, 'seventh'), (6, 'sixth'), (4, 'fourth'), (9, 'ninth'),
-        (11, 'eleventh'), (10, 'tenth'), (13, 'thirteenth'), (15, 'fifteenth'),
-        (14, 'fourteenth'), (12, 'twelfth'), (8, 'eighth'), post_order=True,)
-    assert large.traverse_level_order() == [
-        (8, 'eighth'), (4, 'fourth'), (12, 'twelfth'), (2, 'second'),
-        (6, 'sixth'), (10, 'tenth'), (14, 'fourteenth'), (1, 'first'),
-        (3, 'third'), (5, 'fifth'), (7, 'seventh'), (9, 'ninth'),
-        (11, 'eleventh'), (13, 'thirteenth'), (15, 'fifteenth'),]
-    assert large.traverse_pre_order() == [
-        (8, 'eighth'), (4, 'fourth'), (2, 'second'), (1, 'first'),
-        (3, 'third'), (6, 'sixth'), (5, 'fifth'), (7, 'seventh'),
-        (12, 'twelfth'), (10, 'tenth'), (9, 'ninth'), (11, 'eleventh'),
-        (14, 'fourteenth'), (13, 'thirteenth'), (15, 'fifteenth'),]
-    assert large.traverse_in_order() == [
-        (1, 'first'), (2, 'second'), (3, 'third'), (4, 'fourth'), (5, 'fifth'),
-        (6, 'sixth'), (7, 'seventh'), (8, 'eighth'), (9, 'ninth'),
-        (10, 'tenth'), (11, 'eleventh'), (12, 'twelfth'), (13, 'thirteenth'),
-        (14, 'fourteenth'), (15, 'fifteenth'),]
-    assert large.traverse_post_order() == [
-        (1, 'first'), (3, 'third'), (2, 'second'), (5, 'fifth'),
-        (7, 'seventh'), (6, 'sixth'), (4, 'fourth'), (9, 'ninth'),
-        (11, 'eleventh'), (10, 'tenth'), (13, 'thirteenth'), (15, 'fifteenth'),
-        (14, 'fourteenth'), (12, 'twelfth'), (8, 'eighth'),]
-
-
-def test_construct_bst_post_order_fail():
-    with raises(ValueError) as e:
-        BST(
-            (1, '1'), (3, '3'), (4, '4'), (6, '6'), (7, '7'), (2, '2'),
-            (5, '5'), post_order=True,)
-
-    assert (
-        'Cannot construct valid binary search tree ' +
-        'from provided post-order sequence!'
-    ) in str(e.value)
+    for tree in (
+        example_perfect_bst_small,
+        example_perfect_bst_medium,
+        example_perfect_bst_large,
+    ):
+        copy = tree.copy()
+        assert copy is not tree
+        assert copy._BinarySearchTree__root is not None # type: ignore
+        assert tree._BinarySearchTree__root is not None # type: ignore
+        assert copy._BinarySearchTree__root is not ( # type: ignore
+            tree._BinarySearchTree__root # type: ignore
+        )
+        assert copy._BinarySearchTree__root.data.key == ( # type: ignore
+            tree._BinarySearchTree__root.data.key # type: ignore
+        )
+        assert copy._BinarySearchTree__root.data.value == ( # type: ignore
+            tree._BinarySearchTree__root.data.value # type: ignore
+        )
+        assert copy.traverse_level_order() == tree.traverse_level_order()
+        assert copy.traverse_pre_order() == tree.traverse_pre_order()
+        assert copy.traverse_in_order() == tree.traverse_in_order()
+        assert copy.traverse_post_order() == tree.traverse_post_order()
+        assert copy.height() == tree.height()
 
 
 def test_bst_get_success(example_perfect_bst_small: BST[str]):
@@ -446,9 +268,9 @@ def test_bst_put_success_update(example_perfect_bst_small: BST[str]):
 
 def test_bst_put_success_empty():
     t = BST()
-    assert t._root is None
-    assert t._key_type is None
-    assert t._value_type is None
+    assert t._BinarySearchTree__root is None
+    assert t._BinarySearchTree__key_type is None
+    assert t._BinarySearchTree__value_type is None
 
     with raises(RuntimeError) as e:
         t.get('1')
@@ -456,15 +278,15 @@ def test_bst_put_success_empty():
 
     t.put('1', 'first')
     assert t.get('1') == 'first'
-    assert t._root is not None
-    assert t._root.key == '1'
-    assert t._root.value == 'first'
-    assert str(t._key_type) == "<class 'str'>"
-    assert str(t._value_type) == "<class 'str'>"
+    assert t._BinarySearchTree__root is not None
+    assert t._BinarySearchTree__root.data.key == '1'
+    assert t._BinarySearchTree__root.data.value == 'first'
+    assert str(t._BinarySearchTree__key_type) == "<class 'str'>"
+    assert str(t._BinarySearchTree__value_type) == "<class 'str'>"
     t['2'] = 'second'
     assert t.get('2') == 'second'
-    assert t._root.right.key == '2'
-    assert t._root.right.value == 'second'
+    assert t._BinarySearchTree__root.right.data.key == '2'
+    assert t._BinarySearchTree__root.right.data.value == 'second'
 
 
 def test_bst_put_fail_invalid_key(example_perfect_bst_small: BST[str]):
@@ -488,18 +310,98 @@ def test_bst_put_fail_typeerror_value(example_perfect_bst_small: BST[str]):
     assert f"Value must be of type <class 'str'>!" in str(e.value)
 
 
-def test_bst_remove_success(example_perfect_bst_small: BST[str]):
-    assert example_perfect_bst_small.get(3) == 'third'
-    example_perfect_bst_small.remove(3)
-    with raises(KeyError) as e:
-        example_perfect_bst_small.get(3)
-    assert 'Key 3 not found!' in str(e.value)
+def test_bst_remove_success(example_perfect_bst_large: BST[str]):
+    t = example_perfect_bst_large
 
-    assert example_perfect_bst_small.get(2) == 'second'
-    del example_perfect_bst_small[2]
+    assert t.get(2) == 'second'
+    assert t._BinarySearchTree__root.left.left.data.key == 2 # type: ignore
+    t.remove(2)
     with raises(KeyError) as e:
-        example_perfect_bst_small.get(2)
+        t.get(2)
     assert 'Key 2 not found!' in str(e.value)
+    assert t.traverse_in_order() == [
+        (1, 'first'), (3, 'third'), (4, 'fourth'), (5, 'fifth'), (6, 'sixth'),
+        (7, 'seventh'), (8, 'eighth'), (9, 'ninth'), (10, 'tenth'),
+        (11, 'eleventh'), (12, 'twelfth'), (13, 'thirteenth'),
+        (14, 'fourteenth'), (15, 'fifteenth'),]
+    assert t._BinarySearchTree__root.left.left.data.key == 3 # type: ignore
+
+    assert t.get(3) == 'third'
+    t.remove(3)
+    with raises(KeyError) as e:
+        t.get(3)
+    assert 'Key 3 not found!' in str(e.value)
+    assert t.traverse_in_order() == [
+        (1, 'first'), (4, 'fourth'), (5, 'fifth'), (6, 'sixth'),
+        (7, 'seventh'), (8, 'eighth'), (9, 'ninth'), (10, 'tenth'),
+        (11, 'eleventh'), (12, 'twelfth'), (13, 'thirteenth'),
+        (14, 'fourteenth'), (15, 'fifteenth'),]
+    assert t._BinarySearchTree__root.left.left.data.key == 1 # type: ignore
+
+    assert t.get(1) == 'first'
+    t.remove(1)
+    with raises(KeyError) as e:
+        t.get(1)
+    assert 'Key 1 not found!' in str(e.value)
+    assert t.traverse_in_order() == [
+        (4, 'fourth'), (5, 'fifth'), (6, 'sixth'), (7, 'seventh'),
+        (8, 'eighth'), (9, 'ninth'), (10, 'tenth'), (11, 'eleventh'),
+        (12, 'twelfth'), (13, 'thirteenth'), (14, 'fourteenth'),
+        (15, 'fifteenth'),]
+    assert t._BinarySearchTree__root.left.data.key == 4 # type: ignore
+    assert t._BinarySearchTree__root.left.left is None # type: ignore
+
+    assert t.get(4) == 'fourth'
+    del t[4]
+    with raises(KeyError) as e:
+        t.get(4)
+    assert 'Key 4 not found!' in str(e.value)
+    assert t.traverse_in_order() == [
+        (5, 'fifth'), (6, 'sixth'), (7, 'seventh'), (8, 'eighth'),
+        (9, 'ninth'), (10, 'tenth'), (11, 'eleventh'), (12, 'twelfth'),
+        (13, 'thirteenth'), (14, 'fourteenth'), (15, 'fifteenth'),]
+    assert t._BinarySearchTree__root.left.data.key == 6 # type: ignore
+    assert t._BinarySearchTree__root.left.left.data.key == 5 # type: ignore
+
+    assert t.get(8) == 'eighth'
+    assert t._BinarySearchTree__root.data.key == 8 # type: ignore
+    assert \
+        t._BinarySearchTree__root.right.left.left.data.key == 9 # type: ignore
+    del t[8]
+    with raises(KeyError) as e:
+        t.get(8)
+    assert 'Key 8 not found!' in str(e.value)
+    assert t.traverse_in_order() == [
+        (5, 'fifth'), (6, 'sixth'), (7, 'seventh'), (9, 'ninth'),
+        (10, 'tenth'), (11, 'eleventh'), (12, 'twelfth'), (13, 'thirteenth'),
+        (14, 'fourteenth'), (15, 'fifteenth'),]
+    assert t._BinarySearchTree__root.data.key == 9 # type: ignore
+    assert t._BinarySearchTree__root.left.data.key == 6 # type: ignore
+    assert t._BinarySearchTree__root.right.left.data.key == 10 # type: ignore
+    assert \
+        t._BinarySearchTree__root.right.left.right.data.key == ( # type: ignore
+            11
+        )
+    assert t._BinarySearchTree__root.right.left.left is None # type: ignore
+
+    assert t.get(12) == 'twelfth'
+    assert t._BinarySearchTree__root.right.data.key == 12 # type: ignore
+    assert \
+        t._BinarySearchTree__root.right.right.left.data.key == ( # type: ignore
+            13
+        )
+    del t[12]
+    with raises(KeyError) as e:
+        t.get(12)
+    assert 'Key 12 not found!' in str(e.value)
+    assert t.traverse_in_order() == [
+        (5, 'fifth'), (6, 'sixth'), (7, 'seventh'), (9, 'ninth'),
+        (10, 'tenth'), (11, 'eleventh'), (13, 'thirteenth'),
+        (14, 'fourteenth'), (15, 'fifteenth'),]
+    assert t._BinarySearchTree__root.data.key == 9 # type: ignore
+    assert t._BinarySearchTree__root.right.data.key == 13 # type: ignore
+    assert t._BinarySearchTree__root.right.right.data.key == 14 # type: ignore
+    assert t._BinarySearchTree__root.right.right.left is None # type: ignore
 
 
 def test_bst_remove_fail_invalid_key(example_perfect_bst_small: BST[str]):
@@ -521,34 +423,4 @@ def test_bst_remove_fail_keyerror(example_perfect_bst_small: BST[str]):
         example_perfect_bst_small.remove(4)
 
     assert 'Key 4 not found!' in str(e.value)
-
-
-def test_bst_copy(
-    example_perfect_bst_small: BST[str],
-    example_perfect_bst_medium: BST[str],
-    example_perfect_bst_large: BST[str],
-):
-    empty: BST = BST()
-    empty_copy = empty.copy()
-    assert empty is not empty_copy
-    assert empty.height() == -1
-    assert empty_copy.height() == -1
-
-    for tree in (
-        example_perfect_bst_small,
-        example_perfect_bst_medium,
-        example_perfect_bst_large,
-    ):
-        copy = tree.copy()
-        assert copy is not tree
-        assert copy._root is not None and tree._root is not None
-        assert copy._root is not tree._root
-        assert copy._root.key == tree._root.key
-        assert copy._root.value == tree._root.value
-        assert copy.traverse_level_order() == tree.traverse_level_order()
-        assert copy.traverse_pre_order() == tree.traverse_pre_order()
-        assert copy.traverse_in_order() == tree.traverse_in_order()
-        assert copy.traverse_post_order() == tree.traverse_post_order()
-        assert copy.traverse_boundaries() == tree.traverse_boundaries()
-        assert copy.height() == tree.height()
 
